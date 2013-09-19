@@ -1,0 +1,44 @@
+<idea-plugin version="2">
+    <id>ru.trylogic.idea.gitlab.integration</id>
+    <name>GitLab integration</name>
+    <version>1.0</version>
+    <vendor email="bsideup@gmail.com" url="https://github.com/bsideup">Sergei Egorov</vendor>
+
+    <description><![CDATA[
+      <a href="http://gitlab.org/">GitLab</a> integration plugin.
+      Support "Open file in browser" command.
+      ]]></description>
+
+    <change-notes><![CDATA[
+      Initial release. "Open file in browser" command.
+      ]]>
+    </change-notes>
+
+    <idea-version since-build="107.105"/>
+
+    <depends>com.intellij.modules.vcs</depends>
+    <depends>com.intellij.modules.lang</depends>
+    <depends>Git4Idea</depends>
+
+    <application-components>
+    </application-components>
+
+    <project-components>
+    </project-components>
+
+    <actions>
+        <action id="GitLab.Open.In.Browser"
+                class="ru.trylogic.idea.gitlab.integration.actions.GitLabOpenInBrowserAction">
+            <add-to-group group-id="EditorPopupMenu"/>
+            <add-to-group group-id="ProjectViewPopupMenu"/>
+            <add-to-group group-id="EditorTabPopupMenu"/>
+        </action>
+
+        <!--action id="GitLab.Open.Commit.In.Browser" class="ru.trylogic.idea.gitlab.integration.actions.GitLabShowCommitInBrowserFromLogAction">
+            <add-to-group group-id="Git.LogContextMenu" />
+        </action-->
+    </actions>
+
+    <extensions defaultExtensionNs="com.intellij">
+    </extensions>
+</idea-plugin>
