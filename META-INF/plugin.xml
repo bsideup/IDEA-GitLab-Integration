@@ -1,8 +1,8 @@
 <idea-plugin version="2">
     <id>ru.trylogic.idea.gitlab.integration</id>
     <name>GitLab integration</name>
-    <version>1.0</version>
-    <vendor email="bsideup@gmail.com" url="https://github.com/bsideup">Sergei Egorov</vendor>
+    <version>1.0.1</version>
+    <vendor email="bsideup@gmail.com" url="https://github.com/bsideup">Sergei BSiDeUp Egorov</vendor>
 
     <description><![CDATA[
       <a href="http://gitlab.org/">GitLab</a> integration plugin.
@@ -10,11 +10,11 @@
       ]]></description>
 
     <change-notes><![CDATA[
-      Initial release. "Open file in browser" command.
+      Bug fix for IDEA 13 EAP. Tested on 132.719.
       ]]>
     </change-notes>
 
-    <idea-version since-build="107.105"/>
+    <idea-version since-build="132.719"/>
 
     <depends>com.intellij.modules.vcs</depends>
     <depends>com.intellij.modules.lang</depends>
