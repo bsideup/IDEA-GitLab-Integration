@@ -26,8 +26,6 @@ public class GitlabUrlUtil {
     public static String makeRepoUrlFromRemoteUrl(@NotNull String remoteUrl) {
         String cleanedFromDotGit = StringUtil.trimEnd(remoteUrl, ".git");
         
-        System.out.println(cleanedFromDotGit);
-
         if (remoteUrl.startsWith("http://")) {
             return cleanedFromDotGit;
         } else if (remoteUrl.startsWith("git@")) {

@@ -1,7 +1,7 @@
 <idea-plugin version="2">
     <id>ru.trylogic.idea.gitlab.integration</id>
     <name>GitLab integration</name>
-    <version>1.0.1</version>
+    <version>1.0.2</version>
     <vendor email="bsideup@gmail.com" url="https://github.com/bsideup">Sergei BSiDeUp Egorov</vendor>
 
     <description><![CDATA[
@@ -10,7 +10,7 @@
       ]]></description>
 
     <change-notes><![CDATA[
-      Bug fix for IDEA 13 EAP. Tested on 132.719.
+      Bug fix for IDEA 13 EAP. Tested on 132.719. Error notifications support.
       ]]>
     </change-notes>
 

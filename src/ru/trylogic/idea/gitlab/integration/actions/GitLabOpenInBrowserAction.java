@@ -1,7 +1,10 @@
 package ru.trylogic.idea.gitlab.integration.actions;
 
 import com.intellij.ide.BrowserUtil;
+import com.intellij.notification.Notification;
+import com.intellij.notification.NotificationType;
 import com.intellij.openapi.actionSystem.*;
+import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.SelectionModel;
 import com.intellij.openapi.project.DumbAwareAction;
@@ -14,6 +17,7 @@ import com.intellij.openapi.vfs.VirtualFile;
 import git4idea.GitLocalBranch;
 import git4idea.GitRemoteBranch;
 import git4idea.GitUtil;
+import git4idea.Notificator;
 import git4idea.repo.GitRemote;
 import git4idea.repo.GitRepository;
 import git4idea.repo.GitRepositoryManager;
@@ -22,9 +26,16 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import ru.trylogic.idea.gitlab.integration.utils.GitlabUrlUtil;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class GitLabOpenInBrowserAction extends DumbAwareAction {
 
+    public static final Logger LOG = Logger.getInstance("gitlab");
+
     public static final String CANNOT_OPEN_IN_BROWSER = "Cannot open in browser";
+
+    private static final String GITLAB_NOTIFICATION_GROUP = "gitlab";
 
     protected GitLabOpenInBrowserAction() {
         super("Open on GitLab", "Open corresponding link in browser", GitlabIcons.Gitlab_icon);
@@ -35,16 +46,17 @@ public class GitLabOpenInBrowserAction extends DumbAwareAction {
         e.getPresentation().setEnabled(enabled);
     }
 
-    static void showError(Project project, String cannotOpenInBrowser) {
-        showError(project, cannotOpenInBrowser, null);
+    static void showError(Project project, String title, String message) {
+        showError(project, title, message, null);
     }
 
-    static void showError(Project project, String cannotOpenInBrowser, String s) {
-        showError(project, cannotOpenInBrowser, s, null);
-    }
-
-    static void showError(Project project, String cannotOpenInBrowser, String s, String s1) {
-        System.out.println(cannotOpenInBrowser + ";" + s + ";" + s1);
+    static void showError(Project project, String title, String message, String debugInfo) {
+        LOG.warn(title + "; " + message);
+        if (debugInfo != null) {
+            LOG.warn(debugInfo);
+        }
+        Notification notification = new Notification(GITLAB_NOTIFICATION_GROUP, title, message, NotificationType.ERROR);
+        Notificator.getInstance(project).notify(notification);
     }
 
     @Nullable
@@ -143,27 +155,32 @@ public class GitLabOpenInBrowserAction extends DumbAwareAction {
             return;
         }
 
-        if (repository.getRemotes().size() == 0) {
-            showError(project, CANNOT_OPEN_IN_BROWSER, "Can't find gitlab remote");
-            return;
-        }
-
         final String rootPath = repository.getRoot().getPath();
         final String path = virtualFile.getPath();
-        DefaultActionGroup remotesActionGroup = new DefaultActionGroup();
-        remotesActionGroup.add(new RemoteSelectedAction(project, repository, editor, repository.getRemotes().iterator().next(), rootPath, path));
 
+        List<AnAction> remoteSelectedActions = new ArrayList<AnAction>();
 
-        DataContext dataContext = e.getDataContext();
-        final ListPopup popup =
-                JBPopupFactory.getInstance().createActionGroupPopup(
-                        "Select remote",
-                        remotesActionGroup,
-                        dataContext,
-                        JBPopupFactory.ActionSelectionAid.SPEEDSEARCH,
-                        true);
+        for (GitRemote remote : repository.getRemotes()) {
+            remoteSelectedActions.add(new RemoteSelectedAction(project, repository, editor, remote, rootPath, path));
+        }
 
-        popup.showInBestPositionFor(dataContext);
+        if (remoteSelectedActions.size() > 1) {
+            DefaultActionGroup remotesActionGroup = new DefaultActionGroup();
+            remotesActionGroup.addAll(remoteSelectedActions);
+            DataContext dataContext = e.getDataContext();
+            final ListPopup popup = JBPopupFactory.getInstance().createActionGroupPopup(
+                            "Select remote",
+                            remotesActionGroup,
+                            dataContext,
+                            JBPopupFactory.ActionSelectionAid.SPEEDSEARCH,
+                            true);
+
+            popup.showInBestPositionFor(dataContext);
+        } else if (remoteSelectedActions.size() == 1) {
+            remoteSelectedActions.get(0).actionPerformed(null);
+        } else {
+            showError(project, CANNOT_OPEN_IN_BROWSER, "Can't find gitlab remote");
+        }
     }
 
 
@@ -202,7 +219,7 @@ class RemoteSelectedAction extends AnAction {
     }
 
     @Override
-    public void actionPerformed(AnActionEvent anActionEvent) {
+    public void actionPerformed(@Nullable AnActionEvent unused) {
         if (!path.startsWith(rootPath)) {
             GitLabOpenInBrowserAction.showError(project, GitLabOpenInBrowserAction.CANNOT_OPEN_IN_BROWSER,
                     "File is not under repository root", "Root: " + rootPath + ", file: " + path);
@@ -213,7 +230,7 @@ class RemoteSelectedAction extends AnAction {
         if (branch == null) {
             return;
         }
-        
+
         String remoteUrl = remote.getFirstUrl();
 
         if (remoteUrl == null) {
