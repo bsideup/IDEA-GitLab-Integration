@@ -1,8 +1,6 @@
 package ru.trylogic.idea.gitlab.integration.actions;
 
 import com.intellij.ide.BrowserUtil;
-import com.intellij.notification.Notification;
-import com.intellij.notification.NotificationType;
 import com.intellij.openapi.actionSystem.*;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Editor;
@@ -11,13 +9,13 @@ import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.popup.JBPopupFactory;
 import com.intellij.openapi.ui.popup.ListPopup;
+import com.intellij.openapi.vcs.VcsNotifier;
 import com.intellij.openapi.vcs.changes.Change;
 import com.intellij.openapi.vcs.changes.ChangeListManager;
 import com.intellij.openapi.vfs.VirtualFile;
 import git4idea.GitLocalBranch;
 import git4idea.GitRemoteBranch;
 import git4idea.GitUtil;
-import git4idea.Notificator;
 import git4idea.repo.GitRemote;
 import git4idea.repo.GitRepository;
 import git4idea.repo.GitRepositoryManager;
@@ -34,8 +32,6 @@ public class GitLabOpenInBrowserAction extends DumbAwareAction {
     public static final Logger LOG = Logger.getInstance("gitlab");
 
     public static final String CANNOT_OPEN_IN_BROWSER = "Cannot open in browser";
-
-    private static final String GITLAB_NOTIFICATION_GROUP = "gitlab";
 
     protected GitLabOpenInBrowserAction() {
         super("Open on GitLab", "Open corresponding link in browser", GitlabIcons.Gitlab_icon);
@@ -55,8 +51,7 @@ public class GitLabOpenInBrowserAction extends DumbAwareAction {
         if (debugInfo != null) {
             LOG.warn(debugInfo);
         }
-        Notification notification = new Notification(GITLAB_NOTIFICATION_GROUP, title, message, NotificationType.ERROR);
-        Notificator.getInstance(project).notify(notification);
+        VcsNotifier.getInstance(project).notifyError(title, message);
     }
 
     @Nullable
