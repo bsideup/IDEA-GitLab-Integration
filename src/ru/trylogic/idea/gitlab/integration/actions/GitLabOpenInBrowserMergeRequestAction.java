@@ -69,13 +69,15 @@ public class GitLabOpenInBrowserMergeRequestAction extends GitLabOpenInBrowserBa
         return ancestryPathResult.get(ancestryPathResult.size() - 1);
     }
 
+    @Nullable
     static String getCurrentLineRevisionNumber(Project project, VirtualFile virtualFile, Editor editor) {
         GitAnnotationProvider annotationProvider = new GitAnnotationProvider(project);
-        FileAnnotation fileAnnotation = null;
+        FileAnnotation fileAnnotation;
         try {
             fileAnnotation = annotationProvider.annotate(virtualFile);
-        } catch (VcsException e1) {
-            e1.printStackTrace();
+        } catch (VcsException e) {
+            showError(project, CANNOT_OPEN_IN_BROWSER, "Can't open the Merge Request page on GitLab due to the exception: " + e);
+            return null;
         }
 
         SelectionModel selectionModel = editor.getSelectionModel();
