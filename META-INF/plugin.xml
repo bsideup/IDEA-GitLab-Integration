@@ -33,6 +33,12 @@
             <add-to-group group-id="ProjectViewPopupMenu"/>
             <add-to-group group-id="EditorTabPopupMenu"/>
         </action>
+        <action id="GitLab.Open.In.BrowserMergeRequest"
+                class="ru.trylogic.idea.gitlab.integration.actions.GitLabOpenInBrowserMergeRequestAction">
+            <add-to-group group-id="EditorPopupMenu"/>
+            <add-to-group group-id="ProjectViewPopupMenu"/>
+            <add-to-group group-id="EditorTabPopupMenu"/>
+        </action>
 
         <!--action id="GitLab.Open.Commit.In.Browser" class="ru.trylogic.idea.gitlab.integration.actions.GitLabShowCommitInBrowserFromLogAction">
             <add-to-group group-id="Git.LogContextMenu" />
