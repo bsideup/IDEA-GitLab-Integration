@@ -25,13 +25,17 @@ public class GitlabUrlUtil {
 
     public static String makeRepoUrlFromRemoteUrl(@NotNull String remoteUrl) {
         String cleanedFromDotGit = StringUtil.trimEnd(remoteUrl, ".git");
-        
+
         if (remoteUrl.startsWith("http://") || remoteUrl.startsWith("https://")) {
             return cleanedFromDotGit;
         } else if (remoteUrl.startsWith("git@")) {
             String cleanedFromGitAt = StringUtil.trimStart(cleanedFromDotGit, "git@");
 
-            return "http://" + StringUtil.replace(cleanedFromGitAt, ":", "/");
+            return "https://" + StringUtil.replace(cleanedFromGitAt, ":", "/");
+        } else if (remoteUrl.startsWith("ssh://git@")) {
+            String cleanedFromSshGitAt = StringUtil.trimStart(cleanedFromDotGit,"ssh://git@");
+
+            return "https://" + cleanedFromSshGitAt.replaceFirst(":\\d+(?=/)","");
         } else {
             throw new IllegalStateException("Invalid remote Gitlab url: " + remoteUrl);
         }
